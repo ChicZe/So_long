@@ -1,0 +1,72 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: ciusca <ciusca@student.42.fr>              +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/12/01 13:51:20 by ciusca            #+#    #+#              #
+#    Updated: 2024/01/15 17:19:44 by ciusca           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+NAME = so_long
+NAME_BONUS = so_long_bonus
+
+SRCS = main.c map_parsing.c sprites_handle.c utils2.c controls.c utils.c handle_map.c gui.c
+BONUS_SRCS = bonus/handle_enemies.c bonus/map_parsing_bonus.c  bonus/sprites_handle_bonus.c bonus/utils2_bonus.c bonus/controls_bonus.c bonus/utils_bonus.c bonus/handle_map_bonus.c bonus/enemies_bonus.c bonus/gui_bonus.c
+
+BONUS_OBJS = ${BONUS_SRCS:.c=.o}
+OBJS = ${SRCS:.c=.o}
+
+MLX_PATH = mlx/
+MLX_A = libmlx.a
+MLX = $(addprefix $(MLX_PATH), $(MLX_A))
+
+MLX_INCLUDE = -lXext -lX11 -lm
+
+LIBFT_PATH = libft/
+LIBFT = libft/libft.a
+
+COMPILE = cc -Wall -Wextra -Werror -g
+
+NONE = '\033[0m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+GRAY = '\033[2;37m'
+CURSIVE = '\033[3m
+
+all: $(NAME)
+
+%.o: %.c
+		$(COMPILE) -I -c $< -o $@
+$(NAME): $(OBJS)
+	make -C mlx/
+	make -C libft/
+	$(COMPILE)  $(OBJS) $(MLX) $(LIBFT) $(MLX_INCLUDE) -o $(NAME)
+	@echo $(GREEN) "Compiled successfully! Now just type ./so_long Maps/chose_a_map" $(NONE)
+
+bonus: $(NAME_BONUS)
+
+%.o: %.c
+		$(COMPILE) -I /bonus -c $< -o $@
+$(NAME_BONUS): $(BONUS_OBJS)
+	make -C mlx/
+	make -C libft/
+	$(COMPILE) $(BONUS_OBJS) -o so_long_bonus bonus/main_bonus.c $(MLX) $(LIBFT) $(MLX_INCLUDE)
+	@echo $(GREEN) "Compiled successfully! Now just type ./so_long_bonus Maps/chose_a_map" $(NONE)
+
+
+clean:
+	@rm -rf $(OBJS) $(BONUS_OBJS)
+	@make -C $(LIBFT_PATH) clean
+	@make -C $(MLX_PATH) clean
+
+fclean: clean
+	@rm -rf $(NAME) $(NAME_BONUS)
+	@make -C $(LIBFT_PATH) fclean
+	@make -C $(MLX_PATH) clean
+
+re: fclean all
+
+.PHONY: all clean fclean re bonus
